@@ -1,43 +1,282 @@
-\documentclass{article}
-
-% Required package for including images (handles .png, .jpg, .pdf, etc.)
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{hyperref}
 
-\usepackage{geometry}
-\geometry{a4paper, margin=1in}
-\usepackage{caption}
-
-\title{Analysis of a Coin-Flip Game Simulation}
-\author{Tashfeen Omran}
+\title{Visualizing Probability: A Monte Carlo Simulation of Expected Value and the Law of Large Numbers}
+\author{A Study in Computational Statistics}
 \date{\today}
 
 \begin{document}
 
 \maketitle
 
-\section{Introduction}
+\begin{abstract}
+This document explores the fundamental statistical concepts of Expected Value (EV), variance, and the Law of Large Numbers (LLN) through a series of Monte Carlo simulations. By simulating a simple coin flip game with positive, negative, and neutral expected values across a growing number of trials, we can visually demonstrate how short-term randomness converges to long-term predictability. The simulations serve as a practical bridge between abstract probability theory and tangible outcomes.
+\end{abstract}
 
-This document analyzes the results of a Monte Carlo simulation of a simple coin-flipping game. The simulation visualizes the potential outcomes and profit distributions of the game. The generated plot is included and centered in the following section.
+\tableofcontents
+\clearpage
 
-\section{Simulation Results}
+% --- SECTION 1: INTRODUCTION & MATHEMATICAL FOUNDATION ---
+\section{Introduction and Mathematical Foundation}
 
-The figure below illustrates the outcomes of the simulation. The top plot shows the cumulative profit over a series of flips, while the bottom plot shows a histogram of the final profits from all simulations.
+In the study of probability, predicting the outcome of a single random event is impossible. However, over a large number of repetitions, patterns emerge from the chaos. This phenomenon is the bedrock of the insurance industry, casino operations, and quantitative finance. Our experiment uses a Monte Carlo method—a computational technique that relies on repeated random sampling—to simulate a coin flip game and observe these principles in action.
 
-% The 'figure' environment with the \centering command
-% is the standard way to insert and center an image.
-\begin{figure}[!htbp]
-    \centering
-    
-    % Include the PNG file directly.
-    % Ensure 'coin_flip_simulation.png' is in the same folder as your .tex file.
-    \includegraphics[width=\textwidth]{coin_flip_simulation.png}
-    
-    \caption{A Monte Carlo simulation of a coin-flip game, displaying both the cumulative profit paths and the final profit distribution.}
-    \label{fig:coin_simulation}
+\subsection{Expected Value (EV)}
+The Expected Value (EV) is the long-run average value of a random variable. It represents the mean outcome if an experiment were repeated an infinite number of times. It is calculated by summing the products of each possible outcome and its probability.
+
+The general formula is:
+\[
+E[X] = \sum_{i=1}^{n} x_i P(x_i)
+\]
+Where $x_i$ is the value of outcome $i$ and $P(x_i)$ is its probability.
+
+\subsection{Variance and Standard Deviation}
+Variance ($\sigma^2$) measures the dispersion of a set of outcomes around their mean (the EV). A low variance indicates that the outcomes tend to be very close to the expected value, while a high variance indicates that the outcomes are spread out over a wider range.
+
+The formula for variance is:
+\[
+\sigma^2 = E[(X - \mu)^2] = \sum_{i=1}^{n} (x_i - \mu)^2 P(x_i)
+\]
+Where $\mu$ is the expected value $E[X]$.
+
+\subsection{The Law of Large Numbers (LLN)}
+The Law of Large Numbers (LLN) is a core theorem of probability theory which states that as the size of a sample taken from a population increases, the sample mean ($\bar{X}_n$) will converge to the theoretical expected value ($\mu$).
+\[
+\bar{X}_n \to \mu \quad \text{as} \quad n \to \infty
+\]
+This is the principle that ensures profitability in games of chance where a statistical edge exists. It does not state that results will be "evened out" by future outcomes, but rather that the impact of early-stage variance becomes diluted as the number of trials ($n$) grows.
+
+\subsection{Variance of the Sample Mean}
+The most crucial concept for understanding our simulations is how the variance of the \textbf{average outcome} behaves. If a single game has a variance of $\sigma^2$, the variance of the average profit over $n$ games is:
+\[
+\text{Var}(\bar{X}_n) = \frac{\sigma^2}{n}
+\]
+This formula is the mathematical engine behind the LLN. It shows that as $n$ increases, the variance of the average outcome decreases, meaning the average becomes a more reliable estimate of the true EV. Our confidence in the outcome grows with the sample size.
+
+\clearpage
+
+% --- SECTION 2: POSITIVE EV SIMULATION ---
+\section{Case Study 1: The Positive EV Game}
+In this scenario, the game is structured to be profitable for the player in the long run.
+
+\subsection{Game Rules and Calculation}
+\begin{itemize}
+    \item \textbf{Cost to Play:} \$1.00
+    \item \textbf{Heads Payout:} \$3.00 (Net profit: \$2.00)
+    \item \textbf{Tails Payout:} \$0.00 (Net loss: \$1.00)
+\end{itemize}
+The Expected Value per flip is calculated as:
+\[
+EV = (0.5 \times \$2.00) + (0.5 \times -\$1.00) = \$1.00 - \$0.50 = \boldsymbol{+\$0.50}
+\]
+For every flip, we expect to make an average profit of 50 cents. The variance for a single game is $\sigma^2 = 2.25$.
+
+\subsection{Simulation Results}
+What follows is a series of simulations with an increasing number of flips. We expect the cumulative profit paths to be highly erratic at first but gradually converge toward the theoretical profit line (a slope of +0.50 per flip).
+
+\subsubsection{1 and 5 Flips}
+With a tiny sample size, the outcome is governed entirely by chance. The LLN has no power here. A player is very likely to lose money despite the positive EV, as shown by the wide spread of outcomes. The variance is at its highest.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{+ev/1+ev.png}
+\caption{Simulation with 1 flip (+EV). Outcome is binary: +\$2 or -\$1.}
 \end{figure}
 
-\section{Conclusion}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{+ev/5+ev.png}
+\caption{Simulation with 5 flips (+EV). High variance; final profit is unpredictable.}
+\end{figure}
+\clearpage
 
-As demonstrated in Figure~\ref{fig:coin_simulation}, the simulation provides valuable insights into the risk and reward of the game. This visualization is key to understanding the range of possible outcomes.
+\subsubsection{20 and 100 Flips}
+As we increase the flips, a trend begins to emerge. While many individual simulations still deviate significantly, their collective behavior starts to drift upwards, closer to the theoretical EV line. The probability of being profitable increases.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{+ev/20+ev.png}
+\caption{Simulation with 20 flips (+EV).}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{+ev/100+ev.png}
+\caption{Simulation with 100 flips (+EV). The upward trend is becoming clearer.}
+\end{figure}
+\clearpage
+
+\subsubsection{500 and 1,000 Flips}
+At this stage, the Law of Large Numbers is taking hold. The cumulative profit paths are less erratic and begin to cluster more tightly around the EV line. The histogram of final profits narrows, showing that outcomes are becoming more predictable.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{+ev/500+ev.png}
+\caption{Simulation with 500 flips (+EV).}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{+ev/1000+ev.png}
+\caption{Simulation with 1,000 flips (+EV). Individual paths now closely follow the EV.}
+\end{figure}
+\clearpage
+
+\subsubsection{10,000 Flips}
+With a vast number of flips, the outcome is almost a certainty. The variance of the average profit per flip is now incredibly small, as $\frac{\sigma^2}{n}\to 0$. All simulation paths adhere tightly to the theoretical expectation. The randomness has been effectively "averaged out," leaving only the underlying statistical edge.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{+ev/10k+ev.png}
+\caption{Simulation with 10,000 flips (+EV). Convergence to EV is nearly perfect.}
+\end{figure}
+\clearpage
+
+% --- SECTION 3: NEGATIVE EV SIMULATION ---
+\section{Case Study 2: The Negative EV Game}
+This game mirrors those found in casinos, where the rules create a long-term disadvantage for the player.
+
+\subsection{Game Rules and Calculation}
+\begin{itemize}
+    \item \textbf{Cost to Play:} \$2.00
+    \item \textbf{Heads Payout:} \$3.00 (Net profit: \$1.00)
+    \item \textbf{Tails Payout:} \$0.00 (Net loss: \$2.00)
+\end{itemize}
+The Expected Value per flip is:
+\[
+EV = (0.5 \times \$1.00) + (0.5 \times -\$2.00) = \$0.50 - \$1.00 = \boldsymbol{-\$0.50}
+\]
+On average, a player is guaranteed to lose 50 cents per flip over the long run.
+
+\subsection{Simulation Results}
+The behavior is a mirror image of the positive EV case. Initial luck may lead to profits, but the mathematical disadvantage inevitably pulls the cumulative results downward as the number of flips increases.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{-ev/1-ev.png}
+\caption{Simulation with 1 flip (-EV). Outcome is +\$1 or -\$2.}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{-ev/5-ev.png}
+\caption{Simulation with 5 flips (-EV).}
+\end{figure}
+\clearpage
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{-ev/20-ev.png}
+\caption{Simulation with 20 flips (-EV).}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{-ev/100-ev.png}
+\caption{Simulation with 100 flips (-EV).}
+\end{figure}
+\clearpage
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{-ev/500-ev.png}
+\caption{Simulation with 500 flips (-EV).}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{-ev/1000-ev.png}
+\caption{Simulation with 1,000 flips (-EV).}
+\end{figure}
+\clearpage
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{-ev/10k-ev.png}
+\caption{Simulation with 10,000 flips (-EV). The downward trend is absolute.}
+\end{figure}
+\clearpage
+
+% --- SECTION 4: NEUTRAL EV SIMULATION ---
+\section{Case Study 3: The Neutral EV Game (A Random Walk)}
+This final case represents a "fair game" where neither the player nor the house has an edge.
+
+\subsection{Game Rules and Calculation}
+\begin{itemize}
+    \item \textbf{Cost to Play:} \$1.50
+    \item \textbf{Heads Payout:} \$3.00 (Net profit: \$1.50)
+    \item \textbf{Tails Payout:} \$0.00 (Net loss: \$1.50)
+\end{itemize}
+The Expected Value per flip is:
+\[
+EV = (0.5 \times \$1.50) + (0.5 \times -\$1.50) = \$0.75 - \$0.75 = \boldsymbol{\$0.00}
+\]
+With an EV of zero, there is no long-term upward or downward pressure on the outcome. This is known as a \textbf{Random Walk}.
+
+\subsection{Simulation Results}
+In a random walk, the "expected" final position is the starting point (zero profit). However, the variance of the final position grows with time. The paths do not converge; instead, they diffuse outwards. While the average of all simulations will be near zero, any single simulation is likely to wander far from it.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{nev/1nev.png}
+\caption{Simulation with 1 flip (0 EV). Outcome is +/-\$1.50.}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{nev/5nev.png}
+\caption{Simulation with 5 flips (0 EV).}
+\end{figure}
+\clearpage
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{nev/20nev.png}
+\caption{Simulation with 20 flips (0 EV).}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{nev/100nev.png}
+\caption{Simulation with 100 flips (0 EV).}
+\end{figure}
+\clearpage
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{nev/500nev.png}
+\caption{Simulation with 500 flips (0 EV).}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{nev/1000nev.png}
+\caption{Simulation with 1,000 flips (0 EV).}
+\end{figure}
+\clearpage
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{nev/10knev.png}
+\caption{Simulation with 10,000 flips (0 EV). The paths have diffused widely.}
+\end{figure}
+\clearpage
+
+% --- SECTION 5: CONCLUSION ---
+\section{Conclusion}
+This series of Monte Carlo simulations has provided a clear, visual confirmation of fundamental statistical laws.
+
+\begin{enumerate}
+    \item \textbf{Expected Value dictates the trend.} A positive EV creates a gravitational pull towards profit, while a negative EV ensures long-term loss. A neutral EV results in an aimless random walk.
+    \item \textbf{The Law of Large Numbers ensures convergence.} For games with a non-zero EV, the LLN guarantees that the average outcome will approach this EV as the number of trials increases. This is because the variance of the average profit, $\sigma^2/n$, shrinks towards zero.
+    \item \textbf{Sample size is paramount.} In the short term, variance dominates and outcomes are unpredictable. In the long term, the underlying EV dominates and outcomes become highly predictable. This is the crucial transition from gambling (low $n$) to statistical certainty (high $n$).
+\end{enumerate}
+
+Ultimately, these simulations prove that while individual events are random, the aggregate behavior of a large number of them is not. It is governed by the mathematical structure of the system, and with enough data, the random noise fades to reveal a deterministic trend.
 
 \end{document}
