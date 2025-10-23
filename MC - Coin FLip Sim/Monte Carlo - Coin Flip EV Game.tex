@@ -5,6 +5,35 @@
 \usepackage{graphicx}
 \usepackage[a4paper, margin=1in]{geometry}
 \usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+
+% --- Style configuration for the code block ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
 
 \title{Visualizing Probability: A Monte Carlo Simulation of Expected Value and the Law of Large Numbers}
 \author{Tashfeen Omran}
@@ -308,4 +337,184 @@ However, the strategy's power comes from the enormous number of trials.
 
 In both poker and quantitative finance, the core principle is the same: find an edge (a +EV scenario) and repeat it enough times for the Law of Large Numbers to guarantee a profitable result.
 
+
+\clearpage
+\appendix
+\section{Python Simulation Code}
+
+The following Python code was used to run the Monte Carlo simulations discussed in this paper. It requires the `numpy` and `plotly` libraries.
+
+\begin{lstlisting}[language=Python, caption={Monte Carlo Simulation Script}, label={code:simulation}]
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import os
+from datetime import datetime
+
+COST = 1.5
+PAYOUT_HEADS = 3
+PAYOUT_TAILS = 0
+EV = (0.5 * PAYOUT_HEADS) + (0.5 * PAYOUT_TAILS) - COST
+NUM_FLIPS = 5
+NUM_SIMULATIONS = 1000
+
+def simulate_coin_flips(n_flips):
+    flips = np.random.randint(0, 2, n_flips)
+    profits = np.where(flips == 1, PAYOUT_HEADS - COST, -COST)
+    cumulative_profit = np.cumsum(profits)
+    return cumulative_profit
+
+print(f"Running {NUM_SIMULATIONS} simulations with {NUM_FLIPS} flips each...")
+all_simulations = []
+final_profits = []
+
+for i in range(NUM_SIMULATIONS):
+    cumulative_profit = simulate_coin_flips(NUM_FLIPS)
+    all_simulations.append(cumulative_profit)
+    final_profits.append(cumulative_profit[-1])
+
+all_simulations = np.array(all_simulations)
+final_profits = np.array(final_profits)
+
+avg_final_profit = np.mean(final_profits)
+theoretical_profit = EV * NUM_FLIPS
+profitable_sims = np.sum(final_profits > 0)
+profit_percentage = (profitable_sims / NUM_SIMULATIONS) * 100
+
+print(f"\n{'='*60}")
+print(f"RESULTS:")
+print(f"{'='*60}")
+print(f"Expected Value per flip: ${EV:.2f}")
+print(f"Theoretical profit after {NUM_FLIPS} flips: ${theoretical_profit:.2f}")
+print(f"Average profit across all simulations: ${avg_final_profit:.2f}")
+print(f"Profitable simulations: {profitable_sims}/{NUM_SIMULATIONS} ({profit_percentage:.1f}%)")
+print(f"Min profit: ${np.min(final_profits):.2f}")
+print(f"Max profit: ${np.max(final_profits):.2f}")
+print(f"{'='*60}\n")
+
+fig = make_subplots(
+    rows=2, cols=1,
+    subplot_titles=(
+        'Cumulative Profit Over Time (Multiple Simulations)',
+        'Distribution of Final Profits'
+    ),
+    vertical_spacing=0.15,
+    row_heights=[0.55, 0.45]
+)
+
+num_to_plot = min(20, NUM_SIMULATIONS)
+x_values = np.arange(1, NUM_FLIPS + 1)
+
+for i in range(num_to_plot):
+    y_with_start = np.concatenate([[0], all_simulations[i]])
+    x_with_start = np.concatenate([[0], x_values])
+
+    fig.add_trace(
+        go.Scatter(
+            x=x_with_start,
+            y=y_with_start,
+            mode='lines',
+            name=f'Sim {i+1}',
+            line=dict(width=1),
+            opacity=0.5,
+            showlegend=False
+        ),
+        row=1, col=1
+    )
+
+# ev line starting from 0
+theoretical_x = np.concatenate([[0], x_values])
+theoretical_y = EV * theoretical_x
+
+fig.add_trace(
+    go.Scatter(
+        x=theoretical_x,
+        y=theoretical_y,
+        mode='lines',
+        name='Expected Value',
+        line=dict(color='red', width=3, dash='dash'),
+        showlegend=True
+    ),
+    row=1, col=1
+)
+
+fig.add_hline(y=0, line_dash="dot", line_color="gray", opacity=0.5, row=1, col=1)
+
+fig.add_trace(
+    go.Histogram(
+        x=final_profits,
+        nbinsx=30,
+        name='Final Profits',
+        marker_color='lightblue',
+        showlegend=False
+    ),
+    row=2, col=1
+)
+
+#avoiding overlap
+fig.add_vline(
+    x=avg_final_profit,
+    line_dash="dash",
+    line_color="blue",
+    annotation_text=f"Avg: ${avg_final_profit:.2f}",
+    annotation_position="top left",
+    annotation_yshift=10,
+    row=2, col=1
+)
+
+fig.add_vline(
+    x=theoretical_profit,
+    line_dash="dash",
+    line_color="red",
+    annotation_text=f"Expected: ${theoretical_profit:.2f}",
+    annotation_position="top right",
+    annotation_yshift=10,
+    row=2, col=1
+)
+
+fig.update_xaxes(title_text="Number of Flips", row=1, col=1)
+fig.update_yaxes(title_text="Cumulative Profit ($)", row=1, col=1)
+fig.update_xaxes(title_text="Final Profit ($)", row=2, col=1)
+fig.update_yaxes(title_text="Frequency", row=2, col=1)
+
+fig.update_layout(
+    height=1000,
+    title_text=f"Monte Carlo Simulation: Coin Flip Game",
+    title_font_size=20,
+    showlegend=True,
+    hovermode='closest',
+    font=dict(size=12),
+    margin=dict(t=120, b=80, l=80, r=80)
+)
+
+fig.add_annotation(
+    text=f"Cost: ${COST} | Heads Win: ${PAYOUT_HEADS} | EV: ${EV:.2f}/flip | {NUM_SIMULATIONS} simulations × {NUM_FLIPS} flips",
+    xref="paper", yref="paper",
+    x=0.5, y=1.05,
+    xanchor='center', yanchor='bottom',
+    showarrow=False,
+    font=dict(size=13, color="gray")
+)
+
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+output_filename = f"coin_flip_simulation_{timestamp}.png"
+
+try:
+    print(f"Exporting plot to {output_filename}...")
+    fig.write_image(output_filename, width=1400, height=1000, scale=2)
+    print(f"✓ Plot saved successfully to {os.path.abspath(output_filename)}")
+except PermissionError:
+    print(f"✗ Permission denied. The file might be open in another program.")
+    print(f"  Trying alternative filename...")
+    alt_filename = f"coin_flip_sim_{timestamp}_alt.png"
+    try:
+        fig.write_image(alt_filename, width=1400, height=1000, scale=2)
+        print(f"✓ Plot saved to {os.path.abspath(alt_filename)}")
+    except Exception as e:
+        print(f"✗ Could not save file: {e}")
+except Exception as e:
+    print(f"✗ Error saving image: {e}")
+
+fig.show()
+\end{lstlisting}
 \end{document}
