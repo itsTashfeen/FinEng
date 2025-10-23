@@ -7,8 +7,8 @@
 \usepackage{hyperref}
 
 \title{Visualizing Probability: A Monte Carlo Simulation of Expected Value and the Law of Large Numbers}
-\author{A Study in Computational Statistics}
-\date{\today}
+\author{Tashfeen Omran}
+\date{October 23, 2025}
 
 \begin{document}
 
@@ -24,7 +24,7 @@ This document explores the fundamental statistical concepts of Expected Value (E
 % --- SECTION 1: INTRODUCTION & MATHEMATICAL FOUNDATION ---
 \section{Introduction and Mathematical Foundation}
 
-In the study of probability, predicting the outcome of a single random event is impossible. However, over a large number of repetitions, patterns emerge from the chaos. This phenomenon is the bedrock of the insurance industry, casino operations, and quantitative finance. Our experiment uses a Monte Carlo method—a computational technique that relies on repeated random sampling—to simulate a coin flip game and observe these principles in action.
+In the study of probability, predicting the outcome of a single random event is impossible. However, over a large number of repetitions, patterns emerge from the chaos. This phenomenon is the bedrock of the insurance industry, casino operations, and quantitative finance. This experiment uses a Monte Carlo method which is a computational technique that relies on repeated random sampling to simulate a coin flip game and observe these principles in action.
 
 \subsection{Expected Value (EV)}
 The Expected Value (EV) is the long-run average value of a random variable. It represents the mean outcome if an experiment were repeated an infinite number of times. It is calculated by summing the products of each possible outcome and its probability.
@@ -57,8 +57,6 @@ The most crucial concept for understanding our simulations is how the variance o
 \text{Var}(\bar{X}_n) = \frac{\sigma^2}{n}
 \]
 This formula is the mathematical engine behind the LLN. It shows that as $n$ increases, the variance of the average outcome decreases, meaning the average becomes a more reliable estimate of the true EV. Our confidence in the outcome grows with the sample size.
-
-\clearpage
 
 % --- SECTION 2: POSITIVE EV SIMULATION ---
 \section{Case Study 1: The Positive EV Game}
@@ -135,7 +133,6 @@ With a vast number of flips, the outcome is almost a certainty. The variance of 
 \includegraphics[width=0.8\textwidth]{+ev/10k+ev.png}
 \caption{Simulation with 10,000 flips (+EV). Convergence to EV is nearly perfect.}
 \end{figure}
-\clearpage
 
 % --- SECTION 3: NEGATIVE EV SIMULATION ---
 \section{Case Study 2: The Negative EV Game}
@@ -200,7 +197,6 @@ The behavior is a mirror image of the positive EV case. Initial luck may lead to
 \includegraphics[width=0.8\textwidth]{-ev/10k-ev.png}
 \caption{Simulation with 10,000 flips (-EV). The downward trend is absolute.}
 \end{figure}
-\clearpage
 
 % --- SECTION 4: NEUTRAL EV SIMULATION ---
 \section{Case Study 3: The Neutral EV Game (A Random Walk)}
@@ -265,7 +261,6 @@ In a random walk, the "expected" final position is the starting point (zero prof
 \includegraphics[width=0.8\textwidth]{nev/10knev.png}
 \caption{Simulation with 10,000 flips (0 EV). The paths have diffused widely.}
 \end{figure}
-\clearpage
 
 % --- SECTION 5: CONCLUSION ---
 \section{Conclusion}
@@ -278,5 +273,39 @@ This series of Monte Carlo simulations has provided a clear, visual confirmation
 \end{enumerate}
 
 Ultimately, these simulations prove that while individual events are random, the aggregate behavior of a large number of them is not. It is governed by the mathematical structure of the system, and with enough data, the random noise fades to reveal a deterministic trend.
+
+% --- SECTION 6: REAL-WORLD APPLICATIONS ---
+\section{Real-World Applications: From Poker to Wall Street}
+
+The principles demonstrated in our coin-flip simulation are not merely academic; they are the mathematical foundation upon which fortunes are built in fields that manage probabilistic outcomes.
+
+\subsection{The Professional Poker Player}
+A common misconception is that poker is a game of luck. While short-term results are heavily influenced by chance (\textit{variance}), long-term success is determined by skill. This skill is, fundamentally, the ability to consistently make decisions with a positive Expected Value.
+
+When a professional player decides whether to call, bet, or fold, they are intuitively (or mathematically) calculating the EV of that decision. They assess:
+\begin{itemize}
+    \item \textbf{Pot Odds:} The ratio of the current size of the pot to the cost of a contemplated call.
+    - \textbf{Equity:} The player's probability of winning the hand against their opponent's likely range of hands.
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{A Single Hand as a Single Flip:} A pro can make a perfect +EV decision but still lose the hand due to a "bad beat." This is the same as our +EV game resulting in a loss on a single flip (tails).
+    \item \textbf{The Law of Large Numbers in Action:} Profitability is realized over thousands of hands. Over a large sample size, the effects of short-term luck are smoothed out, and the player's underlying statistical edge (their skill) prevails, leading to consistent profit.
+    \item \textbf{Bankroll Management as Variance Control:} A professional's bankroll is their tool to withstand variance. It must be large enough to absorb the inevitable downswings (losing streaks) so they can continue playing long enough for their +EV decisions to yield the expected returns.
+\end{itemize}
+
+\subsection{The Quantitative Trader}
+Quantitative trading firms use algorithmic strategies to execute millions of trades per day. Many of these strategies are built on finding a small, persistent statistical edge with a positive Expected Value.
+
+The "edge," or \textit{alpha}, might be minuscule. For example a high-frequency trading strategy might have an EV of a fraction of a cent per share traded. On a single trade, this edge is meaningless and swamped by market noise (\texttit{variance}).
+
+However, the strategy's power comes from the enormous number of trials.
+\begin{itemize}
+    \item \textbf{A Single Trade as a Single Flip:} A single trade can easily lose money.
+    \item \textbf{The Law of Large Numbers at Scale:} By executing millions or billions of trades, the LLN ensures that the tiny positive EV will translate into substantial and highly predictable profits. The sheer volume of trades allows the statistical edge to overcome the randomness of the market.
+    \item \textbf{Risk Management as Variance Control:} Just like a poker player's bankroll, quant firms use sophisticated risk management models. They control position sizes and set stop-losses to ensure that a string of bad outcomes (\textit{variance}) does not wipe out their capital, allowing them to operate long enough for their statistical edge to materialize.
+\end{itemize}
+
+In both poker and quantitative finance, the core principle is the same: find an edge (a +EV scenario) and repeat it enough times for the Law of Large Numbers to guarantee a profitable result.
 
 \end{document}
