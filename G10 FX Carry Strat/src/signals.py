@@ -16,7 +16,7 @@ from typing import Dict, Tuple, Optional
 from pandas.plotting import lag_plot
 
 
-def comput_raw_signals(carry: pd.DataFrame) -> pd.DataFrame:
+def compute_raw_signals(carry: pd.DataFrame) -> pd.DataFrame:
     carry_monthly = carry.resample('ME').last() # resample to month end to avoid daily ranking noise
 
     ranks = carry_monthly.rank(axis=1, ascending=False, method ="first")
